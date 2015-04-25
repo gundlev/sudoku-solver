@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 public interface ISudokuSolver {
 
@@ -48,4 +50,6 @@ public interface ISudokuSolver {
 	 * puzzle, false otherwise.
 	 */
 	public boolean solve();
+	
+	public ArrayList<Integer> GetAssignment(int[][] p);
 }

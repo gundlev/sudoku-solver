@@ -5,7 +5,7 @@ public class SudokuSolver implements ISudokuSolver {
 
 	int[][] puzzle;
 	int size;
-	ArrayList<ArrayList<Integer>> D; //= new ArrayList<ArrayList<Integer>>();
+	ArrayList<ArrayList<Integer>> D = new ArrayList<ArrayList<Integer>>();
 	
 	public int[][] getPuzzle() {
 		return puzzle;
@@ -20,7 +20,15 @@ public class SudokuSolver implements ISudokuSolver {
 		puzzle = new int[size*size][size*size];
 		D = new ArrayList<ArrayList<Integer>>(size*size*size*size);
 		
-		//Initialize each D[X]...
+		for (int i = 0; i < ((size*size)*(size*size)); i++) {
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			for (int j = 0; j < 10; j++) {
+				temp.add(j);
+			}
+			D.add(temp);
+		}
+		
+		//Initialize each D[X]... DONE
 		
 	}
 
@@ -29,8 +37,18 @@ public class SudokuSolver implements ISudokuSolver {
 		ArrayList<Integer> asn = GetAssignment(puzzle);
 		
 		//INITIAL_FC
+		if (!INITIAL_FC(asn)) {
+			System.out.println("Could not complete initial FC");
+			//write to user that the input is invalid.
+		} else {
+			System.out.println("Completed initial FC");
+		}
+		
 		//FC
-
+		ArrayList<Integer> solution = FC(asn);
+		
+		this.puzzle = GetPuzzle(solution);
+		
 		return true;
 	}
 
@@ -43,7 +61,12 @@ public class SudokuSolver implements ISudokuSolver {
 		//YOUR TASK:  Implement FC(asn)
 		//---------------------------------------------------------------------------------
 		public ArrayList FC(ArrayList<Integer> asn) {
-	
+			
+			// Check if the sudoku is already filled out.
+			if (!ContainsZero(asn)) {
+				return asn;
+			}
+			
 			return null;//failure
 		}
 
@@ -165,7 +188,7 @@ public class SudokuSolver implements ISudokuSolver {
 		//------------------------------------------------------------------
 		//CONSISTENT: 
 		//
-		//Given a partiall assignment "asn"  checks whether its extension with 
+		//Given a partial assignment "asn"  checks whether its extension with 
 		//variable = val is consistent with Sudoku rules, i.e. whether it violates
 		//any of constraints whose all variables in the scope have been assigned. 
 		//This implicitly encodes all constraints describing Sudoku.
@@ -366,8 +389,20 @@ public class SudokuSolver implements ISudokuSolver {
 			return X - ((X / (size*size))*size*size);	
 		}	
 		
+		public void InitializeDomains() {
+			for (int i = 0; i < ((size*size)*(size*size)); i++) {
+				D.add(new ArrayList<Integer>());
+			}
+		}
 		
-		
+		public boolean ContainsZero(ArrayList<Integer> asn) {
+			for (int i = 0; i < asn.size(); i++) {
+				if (asn.get(i) == 0) {
+					return true;
+				}
+			}
+			return false;
+		}
 		
 		
 }
