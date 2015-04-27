@@ -41,7 +41,19 @@ public class SudokuSolver implements ISudokuSolver {
 		}
 		
 		//FC
-		ArrayList<Integer> solution = FC(asn);
+		ArrayList<Integer> solution; 
+		
+		// Attempt at seing if the FC just tested on version. Resulted most likely in infinite loop.		
+		//__________________________________________
+		int count = 0; 
+		do {
+			 solution = FC(asn);
+			 count++;
+			 System.out.println(count);
+		} while (solution == null);
+		//__________________________________________
+		
+		
 		
 		System.out.println(solution);
 		
