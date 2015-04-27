@@ -20,13 +20,7 @@ public class SudokuSolver implements ISudokuSolver {
 		puzzle = new int[size*size][size*size];
 		D = new ArrayList<ArrayList<Integer>>(size*size*size*size);
 		
-		for (int i = 0; i < ((size*size)*(size*size)); i++) {
-			ArrayList<Integer> temp = new ArrayList<Integer>();
-			for (int j = 0; j < 10; j++) {
-				temp.add(j);
-			}
-			D.add(temp);
-		}
+		InitializeAndFillDomains();
 		
 		//Initialize each D[X]... DONE
 		
@@ -67,7 +61,28 @@ public class SudokuSolver implements ISudokuSolver {
 				return asn;
 			}
 			
-			return null;//failure
+			//Finding the index of the first 0
+			int X = FindFirstZero(asn);
+			
+			//Clone D
+			ArrayList<ArrayList<Integer>> oldD = CloneDomain();
+			
+			ArrayList<Integer> currentVariable = D.get(X);
+			
+			for (int V : currentVariable) {
+				if (AC_FC(X, V)) {
+					asn.set(X, V);
+					ArrayList<Integer> R = FC(asn);
+					if (R != null) {
+						return R;
+					}
+					asn.set(X,0);
+					D = oldD;
+				} else {
+					D = oldD;
+				}
+			}
+			return null; //failure
 		}
 
 	
@@ -395,6 +410,16 @@ public class SudokuSolver implements ISudokuSolver {
 			}
 		}
 		
+		public void InitializeAndFillDomains() {
+			for (int i = 0; i < ((size*size)*(size*size)); i++) {
+				ArrayList<Integer> temp = new ArrayList<Integer>();
+				for (int j = 1; j < 10; j++) {
+					temp.add(j);
+				}
+				D.add(temp);
+			}
+		}
+		
 		public boolean ContainsZero(ArrayList<Integer> asn) {
 			for (int i = 0; i < asn.size(); i++) {
 				if (asn.get(i) == 0) {
@@ -404,5 +429,26 @@ public class SudokuSolver implements ISudokuSolver {
 			return false;
 		}
 		
+		public int FindFirstZero(ArrayList<Integer> asn) {
+			
+			for (int i = 0 ; i < asn.size() ; i++) {
+				if (asn.get(i) == 0) {
+					return i;
+				}
+			}
+			return 0;
+		}
 		
+		public ArrayList<ArrayList<Integer>> CloneDomain() {
+			ArrayList<ArrayList<Integer>> clone = new ArrayList<ArrayList<Integer>>();
+			
+			for (int i = 0 ; i < D.size() ; i++) {
+				ArrayList<Integer> temp = new ArrayList<Integer>();
+				for (int j : D.get(i)) {
+					temp.add(j);
+				}
+				clone.add(temp);
+			}
+			return clone;
+		}
 }
