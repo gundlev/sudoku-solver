@@ -30,6 +30,8 @@ public class SudokuSolver implements ISudokuSolver {
 	public boolean solve() {
 		ArrayList<Integer> asn = GetAssignment(puzzle);
 		
+		SetInitialDomains(asn);
+		
 		//INITIAL_FC
 		if (!INITIAL_FC(asn)) {
 			System.out.println("Could not complete initial FC");
@@ -40,6 +42,8 @@ public class SudokuSolver implements ISudokuSolver {
 		
 		//FC
 		ArrayList<Integer> solution = FC(asn);
+		
+		System.out.println(solution);
 		
 		this.puzzle = GetPuzzle(solution);
 		
@@ -57,7 +61,9 @@ public class SudokuSolver implements ISudokuSolver {
 		public ArrayList FC(ArrayList<Integer> asn) {
 			
 			// Check if the sudoku is already filled out.
-			if (!ContainsZero(asn)) {
+			
+			
+			if (ContainsNoZero(asn)) {
 				return asn;
 			}
 			
@@ -420,13 +426,13 @@ public class SudokuSolver implements ISudokuSolver {
 			}
 		}
 		
-		public boolean ContainsZero(ArrayList<Integer> asn) {
+		public boolean ContainsNoZero(ArrayList<Integer> asn) {
 			for (int i = 0; i < asn.size(); i++) {
 				if (asn.get(i) == 0) {
-					return true;
+					return false;
 				}
 			}
-			return false;
+			return true;
 		}
 		
 		public int FindFirstZero(ArrayList<Integer> asn) {
@@ -450,5 +456,16 @@ public class SudokuSolver implements ISudokuSolver {
 				clone.add(temp);
 			}
 			return clone;
+		}
+		
+		public void SetInitialDomains(ArrayList<Integer> asn) {
+			for (int i = 0 ; i < asn.size() ; i++) {
+				int V = asn.get(i);
+				if (V != 0) {
+					ArrayList<Integer> X = D.get(i);
+					X.clear();
+					X.add(V);
+				}
+			}
 		}
 }
