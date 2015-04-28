@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class SudokuSolver implements ISudokuSolver {
@@ -41,18 +43,7 @@ public class SudokuSolver implements ISudokuSolver {
 		}
 		
 		//FC
-		ArrayList<Integer> solution; 
-		
-		// Attempt at seing if the FC just tested on version. Resulted most likely in infinite loop.		
-		//__________________________________________
-		int count = 0; 
-		do {
-			 solution = FC(asn);
-			 count++;
-			 System.out.println(count);
-		} while (solution == null);
-		//__________________________________________
-		
+		ArrayList<Integer> solution = FC(asn); 
 		
 		
 		System.out.println(solution);
@@ -83,11 +74,10 @@ public class SudokuSolver implements ISudokuSolver {
 			int X = FindFirstZero(asn);
 			
 			//Clone D
-			ArrayList<ArrayList<Integer>> oldD = CloneDomain();
+			ArrayList<ArrayList<Integer>> oldD = CloneDomain(D);
 			
-			ArrayList<Integer> currentVariable = D.get(X);
+			for (int V : D.get(X).toArray(new Integer[D.get(X).size()])) {
 			
-			for (int V : currentVariable) {
 				if (AC_FC(X, V)) {
 					asn.set(X, V);
 					ArrayList<Integer> R = FC(asn);
@@ -95,10 +85,8 @@ public class SudokuSolver implements ISudokuSolver {
 						return R;
 					}
 					asn.set(X,0);
-					D = oldD;
-				} else {
-					D = oldD;
 				}
+				D = CloneDomain(oldD);
 			}
 			return null; //failure
 		}
@@ -439,25 +427,14 @@ public class SudokuSolver implements ISudokuSolver {
 		}
 		
 		public boolean ContainsNoZero(ArrayList<Integer> asn) {
-			for (int i = 0; i < asn.size(); i++) {
-				if (asn.get(i) == 0) {
-					return false;
-				}
-			}
-			return true;
+			return FindFirstZero(asn) == -1;
 		}
 		
-		public int FindFirstZero(ArrayList<Integer> asn) {
-			
-			for (int i = 0 ; i < asn.size() ; i++) {
-				if (asn.get(i) == 0) {
-					return i;
-				}
-			}
-			return 0;
+		public int FindFirstZero(ArrayList<Integer> asn) {			
+			return asn.indexOf(0);
 		}
 		
-		public ArrayList<ArrayList<Integer>> CloneDomain() {
+		public ArrayList<ArrayList<Integer>> CloneDomain(ArrayList<ArrayList<Integer>> D) {
 			ArrayList<ArrayList<Integer>> clone = new ArrayList<ArrayList<Integer>>();
 			
 			for (int i = 0 ; i < D.size() ; i++) {
