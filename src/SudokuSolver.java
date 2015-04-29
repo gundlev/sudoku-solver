@@ -22,9 +22,8 @@ public class SudokuSolver implements ISudokuSolver {
 		puzzle = new int[size*size][size*size];
 		D = new ArrayList<ArrayList<Integer>>(size*size*size*size);
 		
+		// Initialize and fill all the domains with values from 1-9.
 		InitializeAndFillDomains();
-		
-		//Initialize each D[X]... DONE
 		
 	}
 
@@ -32,24 +31,27 @@ public class SudokuSolver implements ISudokuSolver {
 	public boolean solve() {
 		ArrayList<Integer> asn = GetAssignment(puzzle);
 		
+		// Make sure already set variables only has the value in their domain.
 		SetInitialDomains(asn);
 		
 		//INITIAL_FC
+		// Check if the already set values are arc consistent.
 		if (!INITIAL_FC(asn)) {
-			System.out.println("Could not complete initial FC");
-			//write to user that the input is invalid.
+			// The sudoku could not be solved, return false.
+			System.out.println("Could not complete initial FC. The sudoku violates the constraints");
+			return false;
 		} else {
+			// The constraints hold and we can proceed.
 			System.out.println("Completed initial FC");
 		}
 		
-		//FC
+		// Initialize the forward checking method.
 		ArrayList<Integer> solution = FC(asn); 
-		
-		
-		System.out.println(solution);
-		
+
+		// Set the puzzle to be displayed to the solution found by using the GetPuzzle() method.
 		this.puzzle = GetPuzzle(solution);
 		
+		// Return true to indicate that a solution has been found.
 		return true;
 	}
 
@@ -63,31 +65,36 @@ public class SudokuSolver implements ISudokuSolver {
 		//---------------------------------------------------------------------------------
 		public ArrayList FC(ArrayList<Integer> asn) {
 			
-			// Check if the sudoku is already filled out.
-			
-			
+			// Check if the sudoku is already filled out and an answer thus found.
 			if (ContainsNoZero(asn)) {
 				return asn;
 			}
 			
-			//Finding the index of the first 0
+			// Finding the index of the first 0.
 			int X = FindFirstZero(asn);
 			
-			//Clone D
+			// Clone The domain.
 			ArrayList<ArrayList<Integer>> oldD = CloneDomain(D);
 			
+			// Go throught the values in the domain for the variable.
 			for (int V : D.get(X).toArray(new Integer[D.get(X).size()])) {
-			
+				
+				// Check if there is arc consistency with the chosen variable.
 				if (AC_FC(X, V)) {
+					
+					// Set the variable to the value and move forward by calling the FC method.
 					asn.set(X, V);
 					ArrayList<Integer> R = FC(asn);
 					if (R != null) {
 						return R;
 					}
-					asn.set(X,0);
+					// If the returned value is null, set the value to 0 as it didn't work.
+					asn.set(X,0);	
 				}
+				// Role back the domains to their previous state.
 				D = CloneDomain(oldD);
 			}
+			// If none of the values are arc consistent go one stpe back by returning null.
 			return null; //failure
 		}
 
@@ -416,9 +423,16 @@ public class SudokuSolver implements ISudokuSolver {
 			}
 		}
 		
+		// Initiates and sets all domains in D
 		public void InitializeAndFillDomains() {
+			
+			// Going through all variables in D
 			for (int i = 0; i < ((size*size)*(size*size)); i++) {
+				
+				// Create new Arraylist to be inserted into the spot in D
 				ArrayList<Integer> temp = new ArrayList<Integer>();
+				
+				// Fill all arraylist variables with the domain from 1-9
 				for (int j = 1; j < 10; j++) {
 					temp.add(j);
 				}
@@ -426,17 +440,23 @@ public class SudokuSolver implements ISudokuSolver {
 			}
 		}
 		
+		// Check it there exist a zero in the solution
 		public boolean ContainsNoZero(ArrayList<Integer> asn) {
 			return FindFirstZero(asn) == -1;
 		}
 		
+		// Find the first an dreturn the index of the first zero
 		public int FindFirstZero(ArrayList<Integer> asn) {			
 			return asn.indexOf(0);
 		}
 		
+		// Clone the the Arraylist of domains to be able to role back.
 		public ArrayList<ArrayList<Integer>> CloneDomain(ArrayList<ArrayList<Integer>> D) {
+			
+			// Create new domain Arraylist
 			ArrayList<ArrayList<Integer>> clone = new ArrayList<ArrayList<Integer>>();
 			
+			// Loop through all variables in D and clone the content to the new Domain variable.
 			for (int i = 0 ; i < D.size() ; i++) {
 				ArrayList<Integer> temp = new ArrayList<Integer>();
 				for (int j : D.get(i)) {
@@ -447,9 +467,12 @@ public class SudokuSolver implements ISudokuSolver {
 			return clone;
 		}
 		
+		// Go through all the domains and set the ones with already set numbers.
 		public void SetInitialDomains(ArrayList<Integer> asn) {
 			for (int i = 0 ; i < asn.size() ; i++) {
 				int V = asn.get(i);
+				
+				// If the value is already set (not a 0) delete everything in the domain but the value.
 				if (V != 0) {
 					ArrayList<Integer> X = D.get(i);
 					X.clear();
